@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JARVIS Professional</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>JARVIS</h1>
+        <div class="status-ring" id="mainRing" onclick="startJarvis()">
+            <i class="fas fa-microphone" id="micIcon"></i>
+        </div>
+        <p id="output">System Ready. Click mic to speak.</p>
+    </div>
+
+    <script>
+        async function startJarvis() {
+            const ring = document.getElementById('mainRing');
+            const output = document.getElementById('output');
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+                ring.classList.add('listening');
+                output.innerText = "Listening, Sir...";
+
+                const res = await fetch('/command');
+                const data = await res.json();
+
+                ring.classList.remove('listening');
+                output.innerText = data.status === "success" ? "Command: " + data.command : "Error hearing you.";
+            } catch (err) {
+                output.innerText = "Mic Permission Denied.";
+            }
+        }
+    </script>
+</body>
+</html>
